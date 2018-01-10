@@ -3,7 +3,7 @@ import csv
 import os
 import random
 import sqlite3
-import xml.etree.ElementTree
+import xml.etree.ElementTree as ET
 
 import article
 
@@ -29,6 +29,9 @@ class CSVReader(Reader):
     of articles to speed up accessing the next article.
     """
 
+    '''
+    @param read_file represents a csv file location.
+    '''
     def __init__(self, read_file, buffer_size=None):
         self.read_file = read_file
 
@@ -106,40 +109,51 @@ class XMLReader(Reader):
     def __init__(self, path):
         self.path = path
 
+    """
+    Given the path that leads to a folder of ONLY XML files, the function
+    will pick one and then return the name of it.
+    """
     def _get_next_file(self):
         try:
-            next_file = random.choice(os.listdir(self.path))
+            paths = os.listdir(self.path)
+            if ('desktop.ini' in paths): # issue with internal works of windows
+                paths.remove('desktop.ini')
+            next_file = random.choice(paths)
         except IndexError as _:
             # Provided path has no files
             return None
         return next_file
-
+    
+    """
+    Grabs a random XML article and displays it.
+    """
     def get_next_article(self, next_file=None):
         next_file = next_file or self._get_next_file()
         if not next_file:
             return None
         path_to_file =  self.path + '/' + next_file
-        et = xml.etree.ElementTree.parse(path_to_file)
+        et = ET.parse(path_to_file)
         root = et.getroot()
-
+        
         front = root.find('front')
         article_meta = front.find('article-meta')
 
         ids = article_meta.findall('article-id')
-        id_ = None
+        id_ = None # the number associated with the xml
         for id in ids:
             if 'pub-id-type' in id.attrib and id.attrib['pub-id-type'] == 'pmid':
                 id_ = id.text
 
         title = article_meta.find('title-group').find('article-title').text
-        body = root.find('body') or root.find('abstract')
+        body = root.find('body')
+        abstract = ET.tostring(article_meta.find('abstract')).decode('utf-8')
+        import pdb; pdb.set_trace()
         if body is None:
             return None
-        text = xml.etree.ElementTree.tostring(body).decode('utf-8')
-
-        return article.Article(id_=id_,
-                               title=title,
-                               text=text)
+        text = ET.tostring(body).decode('utf-8')
+        
+        article = article.Article(id_=id_, title=title, text=text)
+        return article
 
 
 class ResearchReader(Reader):

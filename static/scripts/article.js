@@ -1,3 +1,4 @@
+"use-strict";
 function preventMultiCheck() {
     var box = $(this);
     if (box.is(":checked")) {
@@ -94,14 +95,18 @@ function clear() {
     $("#selected").empty();
     $("#warning").empty();
     $("#warning").hide();
+    /*
+    No abstract element yet.
     $("#abstract").html($("#abstract").html().replace(
         new RegExp("<span.+\">|<\/span>", "g"),
         "")
     );
+    */
+
 }
 
 $("input:checkbox").click(preventMultiCheck);
 $("label").click(checkFromLabel);
 $("#add-but").click(add);
 $("#submit-but").click(submit);
-$("#clear-but").click(clear);
+$("#restart-but").click(clear);

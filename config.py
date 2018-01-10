@@ -1,12 +1,10 @@
-
 # The reader to use, along with the paramaters that
 # it accepts in it's constructor
 #
 # Options: csv, sql, xml
-reader = 'research'
+reader = 'xml'
 reader_params = {
-    'csv_file': 'for-full-text-annotation.csv',
-    'path_to_xml_files': 'full-texts-for-annotation'
+    'path': 'path_my_xml_files'
 }
 
 # The writer to use, along with the paramaters that
