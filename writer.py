@@ -1,6 +1,6 @@
 import abc
 import json
-
+import sqlite3
 
 class Writer(object, metaclass=abc.ABCMeta):
     """Write annotation information.
@@ -79,13 +79,14 @@ class SQLiteWriter(Writer):
     def submit_annotation(self, user_id, article_id, annotations, selection=None):
         selection_text = ''
         if selection:
-            selection_text = ', {0}, '.format(selection)
+            selection_text = ' "{0}", '.format(selection)
 
-        query = 'INSERT INTO {0} VALUES({1}, {2},{3}{4})' \
-                .format(self.table, user_id, article_id, selection_text, annotation)
+        query = 'INSERT INTO {0} VALUES("{1}", "{2}",{3}"{4}")' \
+                .format(self.table, user_id, article_id, selection_text, '{}')
         for annotation in annotations:
+            print(query.format(annotation))
             self.cursor.execute(query.format(annotation))
-        self.cursor.commit()
+        self.conn.commit()
 
     def get_results(self):
         self.cursor.execute('SELECT * FROM {0}'.format(self.table))

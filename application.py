@@ -21,7 +21,7 @@ def index():
 @application.route('/start/', methods=['GET', 'POST'])
 def start():
     userid = flask.request.form['userid']
-    return flask.redirect(flask.url_for('annotate', userid=userid))
+    return flask.redirect(flask.url_for('annotate', user_id=userid))
 
 @application.route('/annotate/<user_id>', methods=['GET'])
 def annotate(user_id):
