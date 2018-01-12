@@ -45,7 +45,7 @@ class CSVReader(Reader):
         self.buffer_size = buffer_size
         self._add_to_buffer()
         import pprint; pprint.pprint(self.buffer)
-
+        
     def _add_to_buffer(self):
         with open(self.read_file, 'r') as csvfile:
             lines = csv.DictReader(csvfile)
@@ -126,14 +126,16 @@ class XMLReader(Reader):
     
     """
     Grabs a random XML article and displays it.
+    If the next_file is not equal to 'None', then it will grab the full article.
+    Otherwise, it will only display the abstract.
     """
     def get_next_article(self, next_file=None):
         next_file = next_file or self._get_next_file()
         if not next_file:
             return None
-        path_to_file =  self.path + '/' + next_file
-        et = ET.parse(path_to_file)
-        root = et.getroot()
+        path_to_file =  self.path + '/' + next_file # the path to XML files
+        et = ET.parse(path_to_file) 
+        root = et.getroot() 
         
         front = root.find('front')
         article_meta = front.find('article-meta')
@@ -144,16 +146,23 @@ class XMLReader(Reader):
             if 'pub-id-type' in id.attrib and id.attrib['pub-id-type'] == 'pmid':
                 id_ = id.text
 
-        title = article_meta.find('title-group').find('article-title').text
+        title_xml = article_meta.find('title-group').find('article-title') # grab the title
+        title = ET.tostring(title_xml, encoding='utf8', method='text').decode('utf-8') # get the text 
+       
         body = root.find('body')
-        abstract = ET.tostring(article_meta.find('abstract')).decode('utf-8')
-        import pdb; pdb.set_trace()
+        # get the paragraph associated with the abstract
+        abstract = ET.tostring(article_meta.find('abstract').find('p')).decode('utf-8') 
         if body is None:
             return None
         text = ET.tostring(body).decode('utf-8')
         
-        article = article.Article(id_=id_, title=title, text=text)
-        return article
+        art = article.Article(id_=id_, title=title, text=text)
+        art.get_extra()['path'] = next_file # store the path of this file
+        
+        # only get the abstract if the next_file is None or it doesn't exist
+        if (not(abstract is None) and not(next_file is None)):
+            art.get_extra()['abstract'] = abstract # add the abstract in
+        return art
 
 
 class ResearchReader(Reader):

@@ -84,7 +84,7 @@ function submit() {
     var id = document.getElementById("id").innerHTML;
     var annotations = getFinalText();
     var selection = getCheckBoxSelection();
-    if (annotations.length > 0) {
+    if (annotations.length > 0 || selection == 'Cannot tell based on the abstract') {
         post("/submit/", {"userid": userid, "id": id,
                           "annotations": JSON.stringify(annotations),
                           "selection": selection});
@@ -95,14 +95,6 @@ function clear() {
     $("#selected").empty();
     $("#warning").empty();
     $("#warning").hide();
-    /*
-    No abstract element yet.
-    $("#abstract").html($("#abstract").html().replace(
-        new RegExp("<span.+\">|<\/span>", "g"),
-        "")
-    );
-    */
-
 }
 
 $("input:checkbox").click(preventMultiCheck);
