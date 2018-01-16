@@ -1,27 +1,4 @@
 "use-strict";
-function preventMultiCheck() {
-    var box = $(this);
-    if (box.is(":checked")) {
-        var group = "input:checkbox";
-        $(group).prop("checked", false);
-        box.prop("checked", true);
-    } else {
-        box.prop("checked", false);
-    }
-}
-
-function checkFromLabel() {
-    box = $(this).prev('input');
-    if(box.is(":checked")) {
-        box.prop("checked", false);
-    } else {
-        var group = "input:checkbox";
-        $(group).prop("checked", false);
-        box.prop("checked", true);
-    }
-    document.getElementById("check-warning").style.visibility = "hidden";
-}
-
 function getSelectedText() {
     var text = "";
 
@@ -55,10 +32,6 @@ function add() {
     }
 
     $("#selected").append("<li>" + highlighted + "</li>");
-    $("#text").html($("#text").html().replace(
-        highlighted,
-        "<span style=\"font-weight: bold;\">" + highlighted + "</span>")
-    );
     $("#warning").empty();
 }
 
@@ -72,11 +45,9 @@ function getFinalText() {
 }
 
 function getCheckBoxSelection() {
-    var choice = "";
-    $("input:checkbox:checked").each(function(){
-        choice = $(this).next("label").text();
-    });
-    return choice;
+    var e = document.getElementById("checkbox-list");
+    var text = e.options[e.selectedIndex].text;
+    return text;
 }
 
 function submit() {
@@ -84,11 +55,13 @@ function submit() {
     var id = document.getElementById("id").innerHTML;
     var annotations = getFinalText();
     var selection = getCheckBoxSelection();
+
     if (annotations.length > 0 || selection == 'Cannot tell based on the abstract') {
         post("/submit/", {"userid": userid, "id": id,
                           "annotations": JSON.stringify(annotations),
                           "selection": selection});
     }
+
 }
 
 function clear() {
@@ -97,8 +70,6 @@ function clear() {
     $("#warning").hide();
 }
 
-$("input:checkbox").click(preventMultiCheck);
-$("label").click(checkFromLabel);
 $("#add-but").click(add);
 $("#submit-but").click(submit);
 $("#restart-but").click(clear);

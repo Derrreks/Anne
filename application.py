@@ -21,8 +21,10 @@ def index():
 @application.route('/start/', methods=['GET', 'POST'])
 def start():
     userid = flask.request.form['userid']
+    if (userid is None or userid == ''):
+        userid = 'anon'
     return flask.redirect(flask.url_for('annotate_abstract', userid=userid,
-                                        id_ = anne.get_next_file()))
+                                                id_ = anne.get_next_file()))
 
 @application.route('/annotate_abstract/<userid>/<id_>/', methods=['GET'])
 def annotate_abstract(userid, id_ = None):
@@ -70,29 +72,37 @@ def annotate_full(userid, id_ = None):
     if not art:
         return flask.redirect(flask.url_for('finish'))
     else:
-        return flask.render_template('article.html',
-                                 userid=userid,
-                                 id=art.id_,
-                                 title=art.title,
-                                 text=art.text)
+        return flask.render_template('full_article.html',
+                                     userid = userid,
+                                     id_ = art.id_,
+                                     tabs = art.text,
+                                     options = config.options_full)
 
 
 @application.route('/submit/', methods=['POST'])
 def submit():
     userid = flask.request.form['userid']
-    selected = flask.request.form['selection']
     id_ = flask.request.form['id']
+    selected = flask.request.form['selection']
+    annotations = eval(flask.request.form['annotations'])
+
+    # put all annotations into a string and then use ... as a delimiter
+    annotation_str = ''
+    for a in annotations:
+        annotation_str += a + "..."
+
+    anne.submit_annotation([id_, selected, annotation_str])
+
     if (selected == 'Cannot tell based on the abstract'):
         global last_path
         return flask.redirect(flask.url_for('annotate_full',
-                                            userid=userid, id_=last_path))
+                                            userid=userid, id_= last_path))
     elif (selected == ''):
         return None
     else:
-        annotations = flask.request.form['annotations']
-        annotations = json.loads(annotations)
-        anne.submit_annotation(id_, annotations)
-        return flask.redirect(flask.url_for('annotate', userid=userid))
+        return flask.redirect(flask.url_for('annotate_abstract',
+                                            userid=userid,
+                                            id_ = anne.get_next_file()))
 
 @application.route('/finish/', methods=['GET'])
 def finish():

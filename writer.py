@@ -1,5 +1,6 @@
 import abc
 import json
+import csv
 
 
 class Writer(object, metaclass=abc.ABCMeta):
@@ -37,18 +38,10 @@ class CSVWriter(Writer):
     def __init__(self, write_file):
         self.write_file = write_file
 
-    def submit_annotation(self, user_id, article_id, annotations, selection=None):
-        selection_text = ''
-        if selection:
-            selection_text = '"{0}",'.format(selection)
-
-        with open(self.write_file, 'a') as csvfile:
-            csvfile.write('{0},{1},{2}"{3}"\n'.format(
-                user_id,
-                article_id,
-                selection_text,
-                '","'.join(annotations)
-            ))
+    def submit_annotation(self, data):
+        with open(r'out.csv', 'a') as f:
+            writer = csv.writer(f)
+            writer.writerow(data)
 
     def get_results(self):
         with open(self.write_file, 'r') as csvfile:

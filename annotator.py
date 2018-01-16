@@ -15,11 +15,11 @@ class Annotator(object):
     def get_next_article(self, id_ = None):
         return self.reader.get_next_article(id_)
 
-    def submit_annotation(self, **kwargs):
-        return self.writer.submit_annotation(**kwargs)
+    def submit_annotation(self, data):
+        return self.writer.submit_annotation(data)
 
     def get_results(self):
         return self.writer.get_results()
-        
+
     def get_next_file(self, id_ = None):
         return self.reader._get_next_file()

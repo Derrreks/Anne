@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <head>
+      <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
+      <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  </head>
+<style>
+body {font-family: Arial;}
+
+/* Style the tab */
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+</style>
+</head>
+<body>
+
+  <div style = "margin-bottom:10px;">
+    <div class = "tab">
+      {% for tab in tabs %}
+        <button class="tablinks" onclick="openTab(event, '{{ tab[0] }}')">{{ tab[0] }}</button>
+      {% endfor %}
+
+    </div>
+
+    {%for tab in tabs %}
+    <div id = '{{ tab[0] }}', class="tabcontent" style = "max-height: 400px; overflow: auto;">
+    </div>
+    {% endfor %}
+  </div>
+
+  <script>
+    function openTab(evt, name) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(name).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+  </script>
+
+
+  <script>
+
+    /**
+    * Used to break down a Text into a readable format (see data-definition below).
+    *
+    * @param orig_tab represents the parent HTML element if it exists.
+    * @param text is of the following data definition:
+    * Text is one of:
+    *    - Array of Text
+    *    - ['title', 'paragraph']
+    *    - ['title', Text]
+    */
+    function breakDownText(text, orig_tab) {
+      var copy = orig_tab;
+      if (text.length != 2) {
+        for (var i = 0; i < text.length; i++) {
+          breakDownText(text[i], orig_tab);
+        }
+      } else {
+        if (orig_tab === undefined) {
+          var title = text[0];
+          var tab = document.getElementById(title);
+          var title_element = document.createElement("h3");
+          title_element.innerHTML = title;
+          tab.appendChild(title_element);
+          orig_tab = tab;
+        }
+
+        if (Array.isArray(text[1])) {
+          breakDownText(text[1], orig_tab);
+        } else {
+          if (copy !== undefined) {
+            var title = text[0];
+            var title_element = document.createElement("h3");
+            title_element.innerHTML = title;
+            orig_tab.appendChild(title_element);
+          }
+
+          var text_element = document.createElement("p");
+          text_element.innerHTML = text[1];
+          orig_tab.appendChild(text_element);
+        }
+      }
+
+    }
+
+    // call the function
+    var tab = {{ tabs|tojson }};
+    breakDownText(tab);
+  </script>
+
+  <div class = "row">
+    <div class= "col-md-5 ">
+      <label style = "margin-left: 60px;">
+        With respect to <b> <i> outcome, </i> </b> characterize the reported difference
+        between patients receiving <b> <i> intervention </i> </b> and those receiving
+        <b> <i> comparator. </i> </b>
+      </label>
+    </div>
+
+    <div class="col-md-4">
+      {% if options %}
+          <div class="row warning" id="check-warning">
+          </div>
+          <div class="row">
+            <select class="form-control" id="checkbox-list">
+              <option> </option>
+              {% for option in options %}
+                  <option> {{ option }} </option>
+              {% endfor %}
+            </select>
+          </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <div class = "row">
+    <div class = "col-md-6" style = "margin-left: 50px;">
+      <div class="container">
+        <button type="button" id= "add-but" class="btn"> Add Text </button>
+        <button type="button" id= "restart-but" class="btn"> Clear </button>
+        <button type="button" id= "submit-but" class="btn"> Submit </button>
+      </div>
+    </div>
+
+    <div class = "col-md-5">
+      <div class="row" id="select">
+          <h4> Selected Text</h4>
+          <ol id="selected"></ol>
+      </div>
+    </div>
+  </div>
+
+  <div id="store">
+      <p id="userid">{{ userid }}</p>
+      <p id="id">{{ id }}</p>
+  </div>
+  <script src="{{ url_for('static', filename='scripts/post.js') }}"></script>
+  <script src="{{ url_for('static', filename='scripts/article.js') }}"></script>
+
+</body>
+</html>

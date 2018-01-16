@@ -24,3 +24,9 @@ options = [
     'No significant difference',
     'Cannot tell based on the abstract'
 ]
+
+options_full = [
+    'Significantly increased',
+    'Significantly decreased',
+    'No significant difference'
+]
