@@ -14,10 +14,16 @@ anne = annotator.Annotator(reader.get_reader(config.reader)(**config.reader_para
                            writer.get_writer(config.writer)(**config.writer_params))
 
 
+"""
+Display the main page.
+"""
 @application.route('/', methods=['GET'])
 def index():
     return flask.render_template('index.html')
 
+"""
+Start the program.
+"""
 @application.route('/start/', methods=['GET', 'POST'])
 def start():
     userid = flask.request.form['userid']
@@ -26,6 +32,9 @@ def start():
     return flask.redirect(flask.url_for('annotate_abstract', userid=userid,
                                                 id_ = anne.get_next_file()))
 
+"""
+Display just the abstract.
+"""
 @application.route('/annotate_abstract/<userid>/<id_>/', methods=['GET'])
 def annotate_abstract(userid, id_ = None):
     if id_ is None or id_ == 'None':
@@ -37,11 +46,14 @@ def annotate_abstract(userid, id_ = None):
     else:
         global last_path; last_path = art.get_extra()['path']
         return flask.render_template('article.html',
-                              userid=userid,
-                              id= art.id_,
-                              title = art.title,
-                              text = art.get_extra()['abstract'],
-                              options = config.options)
+                                     userid=userid,
+                                     id= art.id_,
+                                     title = art.title,
+                                     text = art.get_extra()['abstract'],
+                                     outcome = art.get_extra()['outcome'],
+                                     intervention = art.get_extra()['intervention'],
+                                     comparator = art.get_extra()['comparator'],
+                                     options = config.options)
 
 """
 Always grabs a random article and displays the full text.
@@ -49,7 +61,6 @@ Always grabs a random article and displays the full text.
 @application.route('/annotate/<userid>/', methods=['GET'])
 def annotate(userid):
     art = anne.get_next_article()
-
     if not art:
         return flask.redirect(flask.url_for('finish'))
     else:
@@ -76,11 +87,18 @@ def annotate_full(userid, id_ = None):
                                      userid = userid,
                                      id_ = art.id_,
                                      tabs = art.text,
+                                     outcome = art.get_extra()['outcome'],
+                                     intervention = art.get_extra()['intervention'],
+                                     comparator = art.get_extra()['comparator'],
                                      options = config.options_full)
 
 
+"""
+Submits the article id with all annotations.
+"""
 @application.route('/submit/', methods=['POST'])
 def submit():
+    # grab all the info we want to save from javascript code
     userid = flask.request.form['userid']
     id_ = flask.request.form['id']
     selected = flask.request.form['selection']
@@ -93,25 +111,34 @@ def submit():
 
     anne.submit_annotation([id_, selected, annotation_str])
 
+    # if the person can't tell just based off the abstract
     if (selected == 'Cannot tell based on the abstract'):
         global last_path
         return flask.redirect(flask.url_for('annotate_full',
-                                            userid=userid, id_= last_path))
-    elif (selected == ''):
+                                           userid=userid, id_= last_path))
+    elif (selected == ''): # if they haven't selected anything, do nothing
         return None
-    else:
+    else: # otherwise go to the next abstract
         return flask.redirect(flask.url_for('annotate_abstract',
                                             userid=userid,
                                             id_ = anne.get_next_file()))
 
+"""
+Only go to this if there are no more articles to be annotated.
+"""
 @application.route('/finish/', methods=['GET'])
 def finish():
     return flask.render_template('finish.html')
 
+"""
+Call the get results funciton.
+"""
 @application.route('/results/', methods=['GET'])
 def results():
     return anne.get_results()
 
-
+"""
+Run the application.
+"""
 if __name__ == '__main__':
     application.run()

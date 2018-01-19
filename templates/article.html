@@ -5,27 +5,37 @@
         <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     </head>
     <body>
+      <!-- Add in a title. --->
         <div class="row">
             <div class="col-md-10 col-md-offset-1">
                 <h2 id="title">
                   {{ title }}</h2>
             </div>
         </div>
+
+        <!-- Abstract to display. Have a max height of 400 pixels.
+        If it goes over this limit, a scroll bar will be added.
+        -->
         <div class="row">
             <div class="col-md-10 col-md-offset-1" style = "max-height: 400px; overflow: auto;">
                 <p id="text">{{ text|safe }}</p>
             </div>
         </div>
 
+        <!-- Tell the user what is going on. -->
         <div class = "row">
           <div class= "col-md-5 ">
             <label style = "margin-left: 60px;">
-              With respect to <b> <i> outcome, </i> </b> characterize the reported difference
-              between patients receiving <b> <i> intervention </i> </b> and those receiving
-              <b> <i> comparator. </i> </b>
+              With respect to <b> <i> {{ outcome }}, </i> </b> characterize the
+              reported difference between patients receiving <b> <i>
+              {{ intervention }} </i> </b> and those receiving <b> <i> {{ comparator }}.
+              </i> </b>
             </label>
           </div>
 
+          <!-- Get data from python and add in a checkbox-list
+          (i.e. a drag down menu for users to select an option from
+          -->
           <div class="col-md-4">
             {% if options %}
                 <div class="row warning" id="check-warning">
@@ -43,6 +53,7 @@
 
         </div>
 
+        <!-- Set up the buttons for selecting text, clearing everything, and submitting. -->
         <div class = "row">
           <div class = "col-md-6" style = "margin-left: 50px;">
             <div class="container">
@@ -52,6 +63,7 @@
             </div>
           </div>
 
+          <!-- Initialize a place where all the selected text by the user lies. -->
           <div class = "col-md-5">
             <div class="row" id="select">
                 <h4> Selected Text</h4>
@@ -60,7 +72,7 @@
           </div>
         </div>
 
-
+        <!-- Initialize a place to store the data in secret (will send to python code later) -->
         <div id="store">
             <p id="userid">{{ userid }}</p>
             <p id="id">{{ id }}</p>

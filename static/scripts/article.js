@@ -1,4 +1,8 @@
 "use-strict";
+
+/**
+* Get the text that was highlighted by the user.
+*/
 function getSelectedText() {
     var text = "";
 
@@ -13,6 +17,11 @@ function getSelectedText() {
     return text;
 }
 
+/**
+* Check that the string is already highlighted.
+*
+* @param highlighted represents that the user wants to add to the highlighted list.
+*/
 function isAlreadyHighlighted(highlighted) {
     var highlights = getFinalText();
     for (var i = 0; i < highlights.length; i++) {
@@ -23,6 +32,9 @@ function isAlreadyHighlighted(highlighted) {
     return false;
 }
 
+/**
+* Add the text to the on-going list.
+*/
 function add() {
     var highlighted = getSelectedText();
 
@@ -35,6 +47,9 @@ function add() {
     $("#warning").empty();
 }
 
+/**
+* Returns an array of all the text that has been highlighted by the user.
+*/
 function getFinalText() {
     var results = [];
     var annotations = $("#selected li");
@@ -44,12 +59,19 @@ function getFinalText() {
     return results;
 }
 
+/**
+* Returns the text of whatever the user selected for the drop-down menu.
+* i.e. "Significantly increased/decreased... etc."
+*/
 function getCheckBoxSelection() {
     var e = document.getElementById("checkbox-list");
     var text = e.options[e.selectedIndex].text;
     return text;
 }
 
+/**
+* Send the data to the python code.
+*/
 function submit() {
     var userid = document.getElementById("userid").innerHTML;
     var id = document.getElementById("id").innerHTML;
@@ -64,6 +86,9 @@ function submit() {
 
 }
 
+/**
+* Clear all input
+*/
 function clear() {
     $("#selected").empty();
     $("#warning").empty();

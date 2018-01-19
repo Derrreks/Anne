@@ -1,26 +1,43 @@
 <html>
     <head>
+      <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
+      <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
       <style>
 
-        div {
+        body {
+          background-color: #F5F5F5;
+        }
+
+        .part1 {
             text-align: center;
-            height: 100%;
-            width: 50%;
+            height: 40%;
+            width: 40%;
             background-color: white;
+            position: relative;
+            top: 40%;
+            transform: translateY(-40%);
+        }
+
+        .part2 {
+            text-align: center;
+            position: relative;
+            top: 40%;
+            transform: translateY(-40%);
         }
 
         button {
-            background-color: #4CAF50;
+            background-color: #2B547E;
             color: white;
             padding: 14px 20px;
             margin: 8px 0;
             border: none;
             cursor: pointer;
-            width: 100%;
+            width: 90%;
         }
 
         input[type=text] {
-            width: 100%;
+            width: 90%;
             padding: 12px 20px;
             margin: 0px 0;
             box-sizing: border-box;
@@ -32,22 +49,23 @@
 
         h1 {
           text-align:center;
-          color:$white;
-          font-weight:$thin;
+          color: black;
+          font-weight: $thin;
         }
+
 
         input[type=text]:focus {
             border: 3px solid #555;
         }
       </style>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     </head>
     <body>
-      <div id="welcome" style="width:400px; margin:0 auto;">
-            <h1>Login</h1>
-            <input type="text" name="id" id="textfield" placeholder="Username"/>
-            <button id="start-but">Start</button>
+      <div id="welcome" style = "width: 400px; margin: 0 auto;" class = 'part1'>
+        <div class = 'part2'>
+            <h1 class="display-2">Login</h1>
+            <input type="text" name="id" id="textfield" placeholder="Username"/ required>
+            <button id="start-but" class = "btn btn-primary btn-lg">Start</button>
+        </div>
       </div>
         <script type="text/javascript" src="{{ url_for('static', filename='scripts/post.js')}}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='scripts/index.js')}}"></script>

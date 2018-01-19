@@ -49,6 +49,7 @@ body {font-family: Arial;}
 </head>
 <body>
 
+  <!-- Initialize the tab with titles . -->
   <div style = "margin-bottom:10px;">
     <div class = "tab">
       {% for tab in tabs %}
@@ -57,6 +58,7 @@ body {font-family: Arial;}
 
     </div>
 
+    <!-- Create a place to put content for each tab. -->
     {%for tab in tabs %}
     <div id = '{{ tab[0] }}', class="tabcontent" style = "max-height: 400px; overflow: auto;">
     </div>
@@ -64,6 +66,12 @@ body {font-family: Arial;}
   </div>
 
   <script>
+    /**
+    * Displays the information in the tab when clicked on.
+    *
+    * @param evt represents what happend with the tab.
+    * @param name represents which tab to open.
+    */
     function openTab(evt, name) {
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tabcontent");
@@ -94,12 +102,12 @@ body {font-family: Arial;}
     */
     function breakDownText(text, orig_tab) {
       var copy = orig_tab;
-      if (text.length != 2) {
+      if (text.length != 2) { // there are multiple sections here if this is the case
         for (var i = 0; i < text.length; i++) {
-          breakDownText(text[i], orig_tab);
-        }
+          breakDownText(text[i], orig_tab); // break each of these larger sections down
+        }                                  // this is likely the beginnining with all tab headers
       } else {
-        if (orig_tab === undefined) {
+        if (orig_tab === undefined) { // If there is no title for this section, make one.
           var title = text[0];
           var tab = document.getElementById(title);
           var title_element = document.createElement("h3");
@@ -108,9 +116,9 @@ body {font-family: Arial;}
           orig_tab = tab;
         }
 
-        if (Array.isArray(text[1])) {
+        if (Array.isArray(text[1])) { // If there is a sub-section under this section, break it down
           breakDownText(text[1], orig_tab);
-        } else {
+        } else { // otherwise add to it
           if (copy !== undefined) {
             var title = text[0];
             var title_element = document.createElement("h3");
@@ -131,15 +139,22 @@ body {font-family: Arial;}
     breakDownText(tab);
   </script>
 
+  <!--
+  Create a row where the first component displays the reported
+  outcome/comparator/intervention, and the second part asks
+  the user which of these "options" is true.
+  -->
   <div class = "row">
     <div class= "col-md-5 ">
       <label style = "margin-left: 60px;">
-        With respect to <b> <i> outcome, </i> </b> characterize the reported difference
-        between patients receiving <b> <i> intervention </i> </b> and those receiving
-        <b> <i> comparator. </i> </b>
+        With respect to <b> <i> {{ outcome }}, </i> </b> characterize the
+        reported difference between patients receiving <b> <i>
+        {{ intervention }} </i> </b> and those receiving <b> <i> {{ comparator }}.
+        </i> </b>
       </label>
     </div>
 
+    <!-- Create a drag down menu of the options desired. -->
     <div class="col-md-4">
       {% if options %}
           <div class="row warning" id="check-warning">
@@ -154,9 +169,9 @@ body {font-family: Arial;}
           </div>
       {% endif %}
     </div>
-
   </div>
 
+  <!-- Add in the buttons, in order to add text, clear text, and submit text. -->
   <div class = "row">
     <div class = "col-md-6" style = "margin-left: 50px;">
       <div class="container">
@@ -166,6 +181,7 @@ body {font-family: Arial;}
       </div>
     </div>
 
+    <!-- The section that displays the text. -->
     <div class = "col-md-5">
       <div class="row" id="select">
           <h4> Selected Text</h4>

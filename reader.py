@@ -4,6 +4,8 @@ import os
 import random
 import sqlite3
 import xml.etree.ElementTree as ET
+from get_file_description import get_file_description
+import numpy as np
 
 import article
 
@@ -45,7 +47,7 @@ class CSVReader(Reader):
         self.buffer_size = buffer_size
         self._add_to_buffer()
         import pprint; pprint.pprint(self.buffer)
-        
+
     def _add_to_buffer(self):
         with open(self.read_file, 'r') as csvfile:
             lines = csv.DictReader(csvfile)
@@ -108,6 +110,7 @@ class XMLReader(Reader):
 
     def __init__(self, path):
         self.path = path
+        self.file_description = get_file_description()
 
     """
     Given the path that leads to a folder of ONLY XML files, the function
@@ -123,10 +126,10 @@ class XMLReader(Reader):
             # Provided path has no files
             return None
         return next_file
-    
+
     """
     Return the proper ids associated with this specific XML file.
-    
+
     @param article_meta is the XML element that holds the article title.
     """
     def _get_ids(self, article_meta):
@@ -135,26 +138,26 @@ class XMLReader(Reader):
         for id in ids:
             if 'pub-id-type' in id.attrib and id.attrib['pub-id-type'] == 'pmid':
                 id_ = id.text
-        
+
         return id_
-    
-    
+
+
     """
     Return the title of the article.
-    
+
     @param article_meta is the XML element that holds the article title.
     """
     def _get_title(self, article_meta):
         # grab the title and the text
-        title_xml = article_meta.find('title-group').find('article-title') 
-        title = ET.tostring(title_xml, encoding='utf8', method='text').decode('utf-8') 
+        title_xml = article_meta.find('title-group').find('article-title')
+        title = ET.tostring(title_xml, encoding='utf8', method='text').decode('utf-8')
         return title
-    
+
     """
-    Return the article split into sections. It will return an array of pairs, 
+    Return the article split into sections. It will return an array of pairs,
     with a given pair having a first entry of the title, and the second entry
     containing the actual text of that section.
-    
+
     @param body represents the whole article.
     """
     def _get_sections(self, body):
@@ -171,46 +174,62 @@ class XMLReader(Reader):
                 title = ET.tostring(child, method = 'text', encoding = 'utf8').decode('utf-8')
             else:
                 paragraph += ET.tostring(child).decode('utf-8')
-                
+
         if (title == '' and len(arr) > 0):
             return arr
         elif (len(arr) > 0):
             return [title, arr]
         else:
             return [title, paragraph]
-         
-    
+
+
     """
     Return all of the text in an XML file.
-    
+
     @param body represents the main portion of the XML with the data.
     """
     def _get_full_text(self, body):
         text = ET.tostring(body).decode('utf-8')
         return text
 
-        
+
     """
     Initialize the article to have the proper fields and extra information.
     """
     def _init_article_(self, next_file, article_meta, body):
-        id_ = self._get_ids(article_meta)
-        title = self._get_title(article_meta)     
-        abstract = ET.tostring(article_meta.find('abstract').find('p')).decode('utf-8') 
-        text = self._get_sections(body) #self._get_full_text(body)
-        text.insert(0, ['Abstract', abstract])
-        
+        id_ = self._get_ids(article_meta) # PMC1784771
+        title = self._get_title(article_meta)
+        try:
+            abstract = ET.tostring(article_meta.find('abstract').find('p')).decode('utf-8')
+        except:
+            abstract_sections = self._get_sections(article_meta.find('abstract'))
+            abstract = ''
+            for part in abstract_sections:
+                abstract += part[1]
+
+        if not(body is None):
+            text = self._get_sections(body) #self._get_full_text(body)
+            text.insert(0, ['Abstract', abstract])
+        else:
+            text = [['Abstract', abstract]]
+
         # store the path of this file
-        art = article.Article(id_=id_, title=title, text=text)
+        art = article.Article(id_= id_, title=title, text=text)
         art.get_extra()['path'] = next_file
-        
+
+        file_data = self.file_description[int(id_)]
+        sp_file_data = file_data[np.random.randint(len(file_data))]
+        art.get_extra()['outcome'] = sp_file_data['outcome_name']
+        art.get_extra()['comparator'] = sp_file_data['intervention1']
+        art.get_extra()['intervention'] = sp_file_data['intervention2']
+
         # only get the abstract if the next_file is None or it doesn't exist
         if (not(abstract is None) and not(next_file is None)):
             art.get_extra()['abstract'] = abstract # add the abstract in
-            
-        
+
+
         return art
-    
+
     """
     Grabs a random XML article and displays it.
     If the next_file is not equal to 'None', then it will grab the full article.
@@ -218,52 +237,26 @@ class XMLReader(Reader):
     """
     def get_next_article(self, next_file=None):
         next_file = next_file or self._get_next_file()
+
         if not next_file:
             return None
         path_to_file =  self.path + '/' + next_file # the path to XML files
-        et = ET.parse(path_to_file) 
-        root = et.getroot() 
-        
+        et = ET.parse(path_to_file)
+        root = et.getroot()
+
         front = root.find('front')
         article_meta = front.find('article-meta')
         body = root.find('body')
-        if body is None:
-            return None
-        
+
         try:
-            article = self._init_article_(next_file, article_meta, body)
-            return article
+            art = self._init_article_(next_file, article_meta, body)
+            return art
         except:
             return self.get_next_article()
 
-
-class ResearchReader(Reader):
-    """Read from a combination of CSV/XML files.
-
-    A custom reader to support research work.
-    """
-
-    def __init__(self, csv_file, path_to_xml_files):
-        with open(csv_file, 'r') as f:
-            self.entries = list(csv.DictReader(f))
-        self.curr_idx = 0
-        self.max_idx = len(self.entries) - 1
-        self.xml_reader = XMLReader(path_to_xml_files)
-
-    def get_next_article(self):
-        if self.curr_idx > self.max_idx:
-            return None
-
-        entry = self.entries[self.curr_idx]
-        self.curr_idx += 1
-
-        art = self.xml_reader.get_next_article(entry['XML_file_names'])
-        if art is None:
-            return self.get_next_article()
-        art.entry = entry
-        return art
-
-
+"""
+Builder pattern for readers.
+"""
 def get_reader(reader):
     options = {
         'csv': CSVReader,
