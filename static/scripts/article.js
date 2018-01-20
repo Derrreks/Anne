@@ -1,4 +1,4 @@
-"use-strict";
+"use strict";
 
 /**
 * Get the text that was highlighted by the user.
@@ -33,7 +33,7 @@ function isAlreadyHighlighted(highlighted) {
 }
 
 /**
-* Add the text to the on-going list.
+* Add the text to the ongoing list.
 */
 function add() {
     var highlighted = getSelectedText();
@@ -60,13 +60,11 @@ function getFinalText() {
 }
 
 /**
-* Returns the text of whatever the user selected for the drop-down menu.
-* i.e. "Significantly increased/decreased... etc."
+* Returns the text of what the user selected from the drop-down menu.
 */
 function getCheckBoxSelection() {
-    var e = document.getElementById("checkbox-list");
-    var text = e.options[e.selectedIndex].text;
-    return text;
+    var checkbox = document.getElementById("checkbox-list");
+    return checkbox.options[checkbox.selectedIndex].text;
 }
 
 /**
@@ -83,11 +81,10 @@ function submit() {
                           "annotations": JSON.stringify(annotations),
                           "selection": selection});
     }
-
 }
 
 /**
-* Clear all input
+* Clear all input.
 */
 function clear() {
     $("#selected").empty();

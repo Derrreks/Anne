@@ -1,3 +1,5 @@
+"use strict";
+
 /**
 * Send the data to the python code.
 *
