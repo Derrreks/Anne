@@ -31,9 +31,6 @@ class CSVReader(Reader):
     of articles to speed up accessing the next article.
     """
 
-    '''
-    @param read_file represents a csv file location.
-    '''
     def __init__(self, read_file, buffer_size=None):
         self.read_file = read_file
 
@@ -112,27 +109,23 @@ class XMLReader(Reader):
         self.path = path
         self.file_description = get_file_description()
 
-    """
-    Given the path that leads to a folder of ONLY XML files, the function
-    will pick one and then return the name of it.
-    """
+
     def _get_next_file(self):
+        """Returns an XML file from `path` if exists"""
         try:
             paths = os.listdir(self.path)
             if ('desktop.ini' in paths): # issue with internal works of windows
                 paths.remove('desktop.ini')
             next_file = random.choice(paths)
-        except IndexError as _:
-            # Provided path has no files
+        except:
             return None
         return next_file
 
-    """
-    Return the proper ids associated with this specific XML file.
-
-    @param article_meta is the XML element that holds the article title.
-    """
     def _get_ids(self, article_meta):
+        """Return the proper ids associated with this specific XML file
+
+        @param article_meta the XML element that holds the article title.
+        """
         ids = article_meta.findall('article-id')
         id_ = None # the number associated with the xml
         for id in ids:
@@ -141,26 +134,24 @@ class XMLReader(Reader):
 
         return id_
 
-
-    """
-    Return the title of the article.
-
-    @param article_meta is the XML element that holds the article title.
-    """
     def _get_title(self, article_meta):
-        # grab the title and the text
+        """Return the title of the article.
+
+        @param article_meta the XML element that holds the article title.
+        """
         title_xml = article_meta.find('title-group').find('article-title')
         title = ET.tostring(title_xml, encoding='utf8', method='text').decode('utf-8')
         return title
 
-    """
-    Return the article split into sections. It will return an array of pairs,
-    with a given pair having a first entry of the title, and the second entry
-    containing the actual text of that section.
 
-    @param body represents the whole article.
-    """
     def _get_sections(self, body):
+        """Return the article split into sections.
+        It will return an array of pairs, with a given pair having a first
+        entry of the title, and the second entry containing the actual
+        text of that section.
+
+        @param body represents the whole article.
+        """
         arr = []
         title = ""
         paragraph = ""
@@ -183,20 +174,16 @@ class XMLReader(Reader):
             return [title, paragraph]
 
 
-    """
-    Return all of the text in an XML file.
-
-    @param body represents the main portion of the XML with the data.
-    """
     def _get_full_text(self, body):
+        """Return all of the text in an XML file.
+
+        @param body represents the main portion of the XML with the data.
+        """
         text = ET.tostring(body).decode('utf-8')
         return text
 
-
-    """
-    Initialize the article to have the proper fields and extra information.
-    """
     def _init_article_(self, next_file, article_meta, body):
+        """Initialize the article to have the proper fields"""
         id_ = self._get_ids(article_meta) # PMC1784771
         title = self._get_title(article_meta)
         try:
@@ -227,15 +214,10 @@ class XMLReader(Reader):
         if (not(abstract is None) and not(next_file is None)):
             art.get_extra()['abstract'] = abstract # add the abstract in
 
-
         return art
 
-    """
-    Grabs a random XML article and displays it.
-    If the next_file is not equal to 'None', then it will grab the full article.
-    Otherwise, it will only display the abstract.
-    """
     def get_next_article(self, next_file=None):
+        """Grabs a random XML article and displays it"""
         next_file = next_file or self._get_next_file()
 
         if not next_file:
@@ -254,15 +236,13 @@ class XMLReader(Reader):
         except:
             return self.get_next_article()
 
-"""
-Builder pattern for readers.
-"""
+
 def get_reader(reader):
+    """Builder pattern for readers"""
     options = {
         'csv': CSVReader,
         'sql': SQLiteReader,
         'xml': XMLReader,
-        'research': ResearchReader
     }
     if reader in options:
         return options[reader]

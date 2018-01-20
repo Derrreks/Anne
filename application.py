@@ -14,29 +14,25 @@ anne = annotator.Annotator(reader.get_reader(config.reader)(**config.reader_para
                            writer.get_writer(config.writer)(**config.writer_params))
 
 
-"""
-Display the main page.
-"""
 @application.route('/', methods=['GET'])
 def index():
+    """Display the home page"""
     return flask.render_template('index.html')
 
-"""
-Start the program.
-"""
+
 @application.route('/start/', methods=['GET', 'POST'])
 def start():
+    """Start the annotations"""
     userid = flask.request.form['userid']
     if (userid is None or userid == ''):
         userid = 'anon'
     return flask.redirect(flask.url_for('annotate_abstract', userid=userid,
                                                 id_ = anne.get_next_file()))
 
-"""
-Display just the abstract.
-"""
+
 @application.route('/annotate_abstract/<userid>/<id_>/', methods=['GET'])
 def annotate_abstract(userid, id_ = None):
+    """Display the abstract for annotation"""
     if id_ is None or id_ == 'None':
         return flask.redirect(flask.url_for('annotate', userid=userid))
 
@@ -55,11 +51,10 @@ def annotate_abstract(userid, id_ = None):
                                      comparator = art.get_extra()['comparator'],
                                      options = config.options)
 
-"""
-Always grabs a random article and displays the full text.
-"""
+
 @application.route('/annotate/<userid>/', methods=['GET'])
 def annotate(userid):
+    """Always grabs a random article and displays the full text"""
     art = anne.get_next_article()
     if not art:
         return flask.redirect(flask.url_for('finish'))
@@ -70,11 +65,10 @@ def annotate(userid):
                                  title=art.title,
                                  text=art.text)
 
-"""
-Grabs a specified article and displays the full text.
-"""
+
 @application.route('/annotate_full/<userid>/<id_>/', methods=['GET'])
 def annotate_full(userid, id_ = None):
+    """Grabs a specified article and displays the full text"""
     if id_ is None:
         art = anne.get_next_article()
     else:
@@ -93,11 +87,9 @@ def annotate_full(userid, id_ = None):
                                      options = config.options_full)
 
 
-"""
-Submits the article id with all annotations.
-"""
 @application.route('/submit/', methods=['POST'])
 def submit():
+    """Submits the article id with all annotations"""
     # grab all the info we want to save from javascript code
     userid = flask.request.form['userid']
     id_ = flask.request.form['id']
@@ -123,22 +115,18 @@ def submit():
                                             userid=userid,
                                             id_ = anne.get_next_file()))
 
-"""
-Only go to this if there are no more articles to be annotated.
-"""
+
 @application.route('/finish/', methods=['GET'])
 def finish():
+    """Only go to this if there are no more articles to be annotated"""
     return flask.render_template('finish.html')
 
-"""
-Call the get results funciton.
-"""
+
 @application.route('/results/', methods=['GET'])
 def results():
+    """Display the annotations"""
     return anne.get_results()
 
-"""
-Run the application.
-"""
+
 if __name__ == '__main__':
     application.run()
