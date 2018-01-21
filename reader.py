@@ -182,7 +182,7 @@ class XMLReader(Reader):
         text = ET.tostring(body).decode('utf-8')
         return text
 
-    def _init_article_(self, next_file, article_meta, body):
+    def _init_article(self, next_file, article_meta, body):
         """Initialize the article to have the proper fields"""
         id_ = self._get_ids(article_meta) # PMC1784771
         title = self._get_title(article_meta)
@@ -194,7 +194,7 @@ class XMLReader(Reader):
             for part in abstract_sections:
                 abstract += part[1]
 
-        if not(body is None):
+        if body:
             text = self._get_sections(body) #self._get_full_text(body)
             text.insert(0, ['Abstract', abstract])
         else:
@@ -211,7 +211,7 @@ class XMLReader(Reader):
         art.get_extra()['intervention'] = sp_file_data['intervention2']
 
         # only get the abstract if the next_file is None or it doesn't exist
-        if (not(abstract is None) and not(next_file is None)):
+        if abstract and next_file:
             art.get_extra()['abstract'] = abstract # add the abstract in
 
         return art
@@ -231,7 +231,7 @@ class XMLReader(Reader):
         body = root.find('body')
 
         try:
-            art = self._init_article_(next_file, article_meta, body)
+            art = self._init_article(next_file, article_meta, body)
             return art
         except:
             return self.get_next_article()

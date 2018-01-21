@@ -18,15 +18,15 @@ writer_params = {
 
 # If an additional list of checkboxes should be added
 # to the interface, the options to be provided
-options = [
-    'Significantly increased',
-    'Significantly decreased',
-    'No significant difference',
-    'Cannot tell based on the abstract'
-]
-
 options_full = [
     'Significantly increased',
     'Significantly decreased',
     'No significant difference'
+]
+
+options_abstract = [
+    'Significantly increased',
+    'Significantly decreased',
+    'No significant difference',
+    'Cannot tell based on the abstract'
 ]

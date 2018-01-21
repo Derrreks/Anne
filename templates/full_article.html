@@ -163,7 +163,7 @@ body {font-family: Arial;}
             <select class="form-control" id="checkbox-list">
               <option> </option>
               {% for option in options %}
-                  <option> {{ option }} </option>
+                  <option>{{ option }}</option>
               {% endfor %}
             </select>
           </div>
@@ -172,19 +172,19 @@ body {font-family: Arial;}
   </div>
 
   <!-- Add in the buttons, in order to add text, clear text, and submit text. -->
-  <div class = "row">
-    <div class = "col-md-6" style = "margin-left: 50px;">
+  <div class="row">
+    <div class="col-md-6" style="margin-left: 50px;">
       <div class="container">
-        <button type="button" id= "add-but" class="btn"> Add Text </button>
-        <button type="button" id= "restart-but" class="btn"> Clear </button>
-        <button type="button" id= "submit-but" class="btn"> Submit </button>
+        <button type="button" id="add-but" class="btn">Add Text</button>
+        <button type="button" id="restart-but" class="btn">Clear</button>
+        <button type="button" id="submit-but" class="btn">Submit</button>
       </div>
     </div>
 
     <!-- The section that displays the text. -->
     <div class = "col-md-5">
       <div class="row" id="select">
-          <h4> Selected Text</h4>
+          <h4>Selected Text</h4>
           <ol id="selected"></ol>
       </div>
     </div>
@@ -193,9 +193,9 @@ body {font-family: Arial;}
   <div id="store">
       <p id="userid">{{ userid }}</p>
       <p id="id">{{ id }}</p>
+      <p id="article_path">{{ article_path }}</p>
   </div>
   <script src="{{ url_for('static', filename='scripts/post.js') }}"></script>
   <script src="{{ url_for('static', filename='scripts/article.js') }}"></script>
-
 </body>
 </html>
