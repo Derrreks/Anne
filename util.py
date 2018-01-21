@@ -1,10 +1,7 @@
 import csv
 
 
-csv_file_loc = 'for-full-text-annotation.csv'
-
-
-def get_file_description():
+def get_file_description(csv_file_loc):
     """Read in the CSV file and return the required data"""
     data = {}
 

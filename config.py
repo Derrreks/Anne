@@ -4,7 +4,8 @@
 # Options: csv, sql, xml
 reader = 'xml'
 reader_params = {
-    'path': 'full-texts-for-annotation'
+    'path': 'full-texts-for-annotation',
+    'csv_file_loc': 'for-full-text-annotation.csv'
 }
 
 # The writer to use, along with the paramaters that

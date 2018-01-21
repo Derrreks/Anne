@@ -104,9 +104,9 @@ class XMLReader(Reader):
     be of the form of an NLM article.
     """
 
-    def __init__(self, path):
+    def __init__(self, path, csv_file_loc):
         self.path = path
-        self.file_description = util.get_file_description()
+        self.file_description = util.get_file_description(csv_file_loc)
 
 
     def _get_next_file(self):
