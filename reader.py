@@ -229,12 +229,11 @@ class XMLReader(Reader):
         article_meta = front.find('article-meta')
         body = root.find('body')
 
-        # try:
-        art = self._init_article(next_file, article_meta, body)
-        return art
-
-        # except Exception as e:
-        #     return self.get_next_article()
+        try:
+            art = self._init_article(next_file, article_meta, body)
+            return art
+        except:
+            return self.get_next_article()
 
 
 def get_reader(reader):
