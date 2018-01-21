@@ -4,10 +4,9 @@ import os
 import random
 import sqlite3
 import xml.etree.ElementTree as ET
-from get_file_description import get_file_description
-import numpy as np
 
 import article
+import util
 
 
 class Reader(object, metaclass=abc.ABCMeta):
@@ -107,7 +106,7 @@ class XMLReader(Reader):
 
     def __init__(self, path):
         self.path = path
-        self.file_description = get_file_description()
+        self.file_description = util.get_file_description()
 
 
     def _get_next_file(self):
@@ -205,7 +204,7 @@ class XMLReader(Reader):
         art.get_extra()['path'] = next_file
 
         file_data = self.file_description[int(id_)]
-        sp_file_data = file_data[np.random.randint(len(file_data))]
+        sp_file_data = random.choice(file_data)
         art.get_extra()['outcome'] = sp_file_data['outcome_name']
         art.get_extra()['comparator'] = sp_file_data['intervention1']
         art.get_extra()['intervention'] = sp_file_data['intervention2']
@@ -230,11 +229,12 @@ class XMLReader(Reader):
         article_meta = front.find('article-meta')
         body = root.find('body')
 
-        try:
-            art = self._init_article(next_file, article_meta, body)
-            return art
-        except:
-            return self.get_next_article()
+        # try:
+        art = self._init_article(next_file, article_meta, body)
+        return art
+
+        # except Exception as e:
+        #     return self.get_next_article()
 
 
 def get_reader(reader):
